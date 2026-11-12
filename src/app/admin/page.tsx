@@ -12,9 +12,9 @@ import {
   Calendar,
   Phone,
   MapPin,
-  Send,
   CheckCircle2,
   ArrowLeft,
+  Upload,
 } from "lucide-react";
 import { Lead, LeadStatus, Property } from "@/types/estate";
 
@@ -26,23 +26,21 @@ export default function AdminPage() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [leads, setLeads] = useState<Lead[]>([]);
 
-  // Поля формы добавления новой недвижимости
   const [title, setTitle] = useState("");
-  const [district, setDistrict] = useState("Хамовники");
+  const [district, setDistrict] = useState("Крылатское");
   const [address, setAddress] = useState("");
-  const [price, setPrice] = useState("28500000");
-  const [rooms, setRooms] = useState("2");
-  const [area, setArea] = useState("74");
-  const [floor, setFloor] = useState("8");
-  const [totalFloors, setTotalFloors] = useState("18");
-  const [imageUrl, setImageUrl] = useState(
-    "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=85"
-  );
+  const [price, setPrice] = useState("");
+  const [rooms, setRooms] = useState("");
+  const [area, setArea] = useState("");
+  const [floor, setFloor] = useState("");
+  const [totalFloors, setTotalFloors] = useState("16");
+  const [imageUrl, setImageUrl] = useState("");
+  const [uploadedPhotoDataUrl, setUploadedPhotoDataUrl] = useState("");
   const [features, setFeatures] = useState(
-    "Панорамные окна, Терраса, Подземный паркинг"
+    "Для большой семьи, Панорамные окна, Закрытый двор-парк"
   );
   const [description, setDescription] = useState("");
-  const [badge, setBadge] = useState("Новинка");
+  const [badge, setBadge] = useState("Для большой семьи");
   const [addingMsg, setAddingMsg] = useState("");
 
   const fetchAll = async () => {
@@ -62,8 +60,25 @@ export default function AdminPage() {
     }
   }, [authenticated]);
 
+  const handlePhotoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      if (typeof ev.target?.result === "string") {
+        setUploadedPhotoDataUrl(ev.target.result);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleAddProperty = async (e: React.FormEvent) => {
     e.preventDefault();
+    const finalPhoto =
+      uploadedPhotoDataUrl ||
+      imageUrl.trim() ||
+      "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1200&q=85";
+
     const res = await fetch("/api/properties", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -77,7 +92,7 @@ export default function AdminPage() {
         area: Number(area),
         floor: Number(floor),
         totalFloors: Number(totalFloors),
-        imageUrl,
+        imageUrl: finalPhoto,
         features,
         description,
         badge,
@@ -85,12 +100,22 @@ export default function AdminPage() {
     });
 
     if (res.ok) {
+      // Полная очистка всех полей после публикации
       setTitle("");
       setAddress("");
+      setPrice("");
+      setRooms("");
+      setArea("");
+      setFloor("");
+      setImageUrl("");
+      setUploadedPhotoDataUrl("");
       setDescription("");
-      setAddingMsg("Объект успешно добавлен в каталог сайта и базу ИИ!");
+
+      setAddingMsg(
+        "Квартира с фотографией успешно опубликована! (уведомление скроется через 15 секунд)"
+      );
       fetchAll();
-      setTimeout(() => setAddingMsg(""), 4000);
+      setTimeout(() => setAddingMsg(""), 15000);
     }
   };
 
@@ -179,7 +204,7 @@ export default function AdminPage() {
                 Vanguard Realty — Админ-панель
               </h1>
               <p className="text-xs text-zinc-500">
-                Синхронизировано с ИИ-ассистентом и Telegram-ботом
+                Синхронизировано с Neon Postgres и Telegram-ботом
               </p>
             </div>
           </div>
@@ -220,15 +245,13 @@ export default function AdminPage() {
       <main className="max-w-7xl mx-auto p-6 space-y-8">
         {activeTab === "leads" ? (
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold">
-                  Все заявки на просмотр и подбор
-                </h2>
-                <p className="text-xs text-zinc-500">
-                  Сюда поступают заявки с сайта, ИИ-квиза, ИИ-чата и Telegram-бота (а также дублируются в Telegram-группу)
-                </p>
-              </div>
+            <div>
+              <h2 className="text-2xl font-bold">
+                Все заявки на просмотр и подбор
+              </h2>
+              <p className="text-xs text-zinc-500">
+                Сюда поступают заявки с сайта и из Telegram-бота (а также дублируются в Telegram-группу)
+              </p>
             </div>
 
             <div className="grid grid-cols-1 gap-4">
@@ -241,12 +264,8 @@ export default function AdminPage() {
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400">
                         {lead.source === "telegram_bot"
-                          ? "✈️ Telegram-Бот"
-                          : lead.source === "ai_quiz"
-                          ? "🎯 ИИ-Квиз"
-                          : lead.source === "ai_chat"
-                          ? "🤖 ИИ-Чат"
-                          : "🌐 Запись с сайта"}
+                          ? "Telegram-Бот"
+                          : "Запись с сайта"}
                       </span>
                       <span className="text-xs text-zinc-400">
                         ID: {lead.id}
@@ -316,7 +335,6 @@ export default function AdminPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            {/* Форма добавления новой квартиры */}
             <div className="lg:col-span-5">
               <form
                 onSubmit={handleAddProperty}
@@ -334,7 +352,7 @@ export default function AdminPage() {
                   <input
                     type="text"
                     required
-                    placeholder="Видовая резиденция в ЖК «Prime Park»"
+                    placeholder="Семейная резиденция в ЖК «Prime Park»"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-sm"
@@ -361,6 +379,7 @@ export default function AdminPage() {
                     <input
                       type="number"
                       required
+                      placeholder="34000000"
                       value={price}
                       onChange={(e) => setPrice(e.target.value)}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-sm"
@@ -385,10 +404,12 @@ export default function AdminPage() {
                 <div className="grid grid-cols-3 gap-3">
                   <div>
                     <label className="block text-xs font-semibold text-zinc-500 mb-1">
-                      Комнат
+                      Комнат *
                     </label>
                     <input
                       type="number"
+                      required
+                      placeholder="4"
                       value={rooms}
                       onChange={(e) => setRooms(e.target.value)}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-sm"
@@ -396,10 +417,12 @@ export default function AdminPage() {
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-zinc-500 mb-1">
-                      Площадь (м²)
+                      Площадь (м²) *
                     </label>
                     <input
                       type="number"
+                      required
+                      placeholder="145"
                       value={area}
                       onChange={(e) => setArea(e.target.value)}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-sm"
@@ -407,10 +430,12 @@ export default function AdminPage() {
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-zinc-500 mb-1">
-                      Этаж
+                      Этаж *
                     </label>
                     <input
                       type="number"
+                      required
+                      placeholder="7"
                       value={floor}
                       onChange={(e) => setFloor(e.target.value)}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-sm"
@@ -418,27 +443,42 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-semibold text-zinc-500 mb-1">
-                    Ссылка на фото (URL)
+                {/* Бланк для загрузки фотографии квартиры */}
+                <div className="space-y-2">
+                  <label className="block text-xs font-semibold text-zinc-500">
+                    Фотография квартиры (выберите файл с компьютера)
+                  </label>
+                  <label className="flex flex-col items-center justify-center w-full h-36 rounded-2xl border-2 border-dashed border-amber-500/50 hover:border-amber-500 bg-zinc-50 dark:bg-zinc-950 cursor-pointer overflow-hidden relative">
+                    {uploadedPhotoDataUrl ? (
+                      <img
+                        src={uploadedPhotoDataUrl}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="text-center p-4 space-y-1">
+                        <Upload className="w-5 h-5 text-amber-500 mx-auto" />
+                        <div className="text-xs font-bold text-amber-500">
+                          Нажмите для выбора фото квартиры
+                        </div>
+                        <div className="text-[11px] text-zinc-400">
+                          JPG, PNG, WEBP
+                        </div>
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePhotoFileChange}
+                      className="hidden"
+                    />
                   </label>
                   <input
                     type="url"
+                    placeholder="Или вставьте ссылку на фото (необязательно)"
                     value={imageUrl}
                     onChange={(e) => setImageUrl(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-sm"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-zinc-500 mb-1">
-                    Особенности (через запятую)
-                  </label>
-                  <input
-                    type="text"
-                    value={features}
-                    onChange={(e) => setFeatures(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-sm"
+                    className="w-full px-3.5 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-xs"
                   />
                 </div>
 
@@ -450,7 +490,7 @@ export default function AdminPage() {
                     rows={3}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Опишите видовые характеристики, планировку и отделку..."
+                    placeholder="Опишите видовые характеристики, планировку и преимущества..."
                     className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-sm"
                   />
                 </div>
@@ -459,7 +499,7 @@ export default function AdminPage() {
                   type="submit"
                   className="w-full py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm shadow-lg shadow-amber-500/20"
                 >
-                  Добавить квартиру в каталог
+                  Опубликовать квартиру в каталоге
                 </button>
 
                 {addingMsg && (
@@ -471,7 +511,6 @@ export default function AdminPage() {
               </form>
             </div>
 
-            {/* Список объектов */}
             <div className="lg:col-span-7 space-y-4">
               {properties.map((prop) => (
                 <div

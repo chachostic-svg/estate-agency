@@ -3,7 +3,7 @@ import { addLead, getLeads, updateLeadStatus } from "@/lib/db";
 import { sendLeadToTelegramGroup } from "@/lib/telegram";
 
 export async function GET() {
-  const leads = getLeads();
+  const leads = await getLeads();
   return NextResponse.json({ leads });
 }
 
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const newLead = addLead({
+    const newLead = await addLead({
       clientName,
       phone,
       telegramUsername,
@@ -74,7 +74,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "Доступ запрещен" }, { status: 401 });
     }
 
-    const updated = updateLeadStatus(id, status);
+    const updated = await updateLeadStatus(id, status);
     if (!updated) {
       return NextResponse.json({ error: "Заявка не найдена" }, { status: 404 });
     }

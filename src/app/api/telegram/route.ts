@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
 
     // Если это запрос из админки для симуляции/теста заявки из Telegram-бота
     if (update.simulateBotBooking) {
-      const lead = addLead({
+      const lead = await addLead({
         clientName: update.clientName || "Максим Белов (из Telegram)",
         phone: update.phone || "+7 (916) 800-45-12",
         telegramUsername: update.telegramUsername || "@max_belov_tg",
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
     const username = message.from?.username ? `@${message.from.username}` : undefined;
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
 
-    const properties = getProperties();
+    const properties = await getProperties();
 
     if (text === "/start") {
       const catalogList = properties
@@ -67,6 +67,12 @@ export async function POST(req: NextRequest) {
         `Например:\n<code>Запись: Neva Towers, 18 ноября в 15:00, +79991234567</code>`;
 
       if (botToken) {
+        const appUrl =
+          process.env.NEXT_PUBLIC_APP_URL ||
+          (process.env.VERCEL_PROJECT_PRODUCTION_URL
+            ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+            : undefined);
+
         await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -74,6 +80,18 @@ export async function POST(req: NextRequest) {
             chat_id: chatId,
             text: welcomeReply,
             parse_mode: "HTML",
+            reply_markup: appUrl
+              ? {
+                  inline_keyboard: [
+                    [
+                      {
+                        text: "🏛 Открыть каталог Vanguard Realty (Mini App)",
+                        web_app: { url: appUrl },
+                      },
+                    ],
+                  ],
+                }
+              : undefined,
           }),
         });
       }
@@ -92,7 +110,7 @@ export async function POST(req: NextRequest) {
         p.district.toLowerCase().includes(propQuery.toLowerCase())
     );
 
-    const createdLead = addLead({
+    const createdLead = await addLead({
       clientName: firstName,
       phone: phonePart,
       telegramUsername: username,

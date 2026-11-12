@@ -2,16 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import {
-  Send,
-  ShieldCheck,
-  Sparkles,
-  Calendar,
-  Building2,
-  CheckCircle2,
-  ArrowUpRight,
-} from "lucide-react";
-import Link from "next/link";
+import { Building2, CheckCircle2 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { HeroParallax } from "@/components/HeroParallax";
 import { PropertyCatalog } from "@/components/PropertyCatalog";
@@ -25,15 +16,34 @@ export default function HomePage() {
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(
     null
   );
-  const [simulatingBot, setSimulatingBot] = useState(false);
-  const [botSimSuccess, setBotSimSuccess] = useState(false);
+
+  // Состояния для большой формы записи на странице
+  const [mainPropertyId, setMainPropertyId] = useState("");
+  const [mainName, setMainName] = useState("");
+  const [mainPhone, setMainPhone] = useState("");
+  const [mainDate, setMainDate] = useState("2026-11-16");
+  const [mainTime, setMainTime] = useState("14:00");
+  const [mainFormat, setMainFormat] = useState("Для большой семьи с детьми");
+  const [mainComment, setMainComment] = useState("");
+  const [mainNotice, setMainNotice] = useState("");
 
   useEffect(() => {
+    // Инициализация Telegram Mini App (если открыто внутри Telegram)
+    const tg = (window as unknown as { Telegram?: { WebApp?: { ready: () => void; expand: () => void; initDataUnsafe?: { user?: { first_name?: string; username?: string } } } } }).Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+      if (tg.initDataUnsafe?.user?.first_name) {
+        setMainName(tg.initDataUnsafe.user.first_name);
+      }
+    }
+
     fetch("/api/properties")
       .then((r) => r.json())
       .then((d) => {
-        if (Array.isArray(d.properties)) {
+        if (Array.isArray(d.properties) && d.properties.length > 0) {
           setProperties(d.properties);
+          setMainPropertyId(d.properties[0].id);
         }
       })
       .catch(console.error);
@@ -44,29 +54,41 @@ export default function HomePage() {
     setBookingModalOpen(true);
   };
 
-  const handleSimulateTelegramBotBooking = async () => {
-    setSimulatingBot(true);
-    try {
-      await fetch("/api/telegram", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          simulateBotBooking: true,
-          clientName: "Артем Волков (через Telegram-бот)",
-          phone: "+7 (925) 991-04-77",
-          telegramUsername: "@artem_volkov_estate",
-          propertyId: properties[0]?.id || "prop-1",
-          propertyTitle:
-            properties[0]?.title ||
-            "Пентхаус с террасой в ЖК «Vanguard Knightsbridge»",
-          preferredDate: "2026-11-19",
-          preferredTime: "16:00",
-        }),
-      });
-      setBotSimSuccess(true);
-    } finally {
-      setSimulatingBot(false);
-    }
+  const handleSubmitMainBooking = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!mainName || !mainPhone) return;
+
+    const chosenProp =
+      properties.find((p) => p.id === mainPropertyId) || properties[0];
+
+    await fetch("/api/leads", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        clientName: mainName,
+        phone: mainPhone,
+        propertyId: chosenProp?.id,
+        propertyTitle: chosenProp?.title || "Выбранная квартира",
+        preferredDate: mainDate,
+        preferredTime: mainTime,
+        district: chosenProp?.district,
+        source: "website_booking",
+        notes: `${mainFormat}${mainComment ? " | " + mainComment : ""}`,
+      }),
+    });
+
+    // Сразу очищаем заполненные поля формы
+    setMainName("");
+    setMainPhone("");
+    setMainComment("");
+
+    // Показываем уведомление и скрываем ровно через 15 секунд
+    setMainNotice(
+      "Заявка успешно отправлена! Брокер свяжется с вами для подтверждения показа (это уведомление скроется через 15 секунд)."
+    );
+    setTimeout(() => {
+      setMainNotice("");
+    }, 15000);
   };
 
   return (
@@ -74,10 +96,8 @@ export default function HomePage() {
       <Navbar onOpenBooking={() => handleOpenBookingForProperty()} />
 
       <main className="flex-1">
-        {/* Главный экран с параллаксом при скролле */}
         <HeroParallax onOpenBooking={() => handleOpenBookingForProperty()} />
 
-        {/* Секция каталога квартир с фильтрацией и записью на конкретный день */}
         <PropertyCatalog
           properties={properties}
           onSelectPropertyForBooking={(prop) =>
@@ -85,153 +105,218 @@ export default function HomePage() {
           }
         />
 
-        {/* Умный ИИ-помощник (gemini-3.5-flash-lite) + Квиз */}
         <AIQuizAndChat
           properties={properties}
           onBookProperty={(prop) => handleOpenBookingForProperty(prop)}
         />
 
-        {/* Секция преимуществ и автоматизации услуг */}
-        <section id="services" className="py-24">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+        {/* БОЛЬШАЯ СЕКЦИЯ ЗАПИСИ КЛИЕНТОВ НА ПРОСМОТР */}
+        <section id="booking-section" className="py-28">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
-              initial={{ opacity: 0, y: 25 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-center max-w-3xl mx-auto space-y-3"
+              className="rounded-[2rem] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-8 sm:p-14 shadow-2xl space-y-8"
             >
-              <span className="text-xs font-bold uppercase tracking-[0.25em] text-amber-500">
-                ЭКОСИСТЕМА АВТОМАТИЗАЦИИ БИЗНЕСА
-              </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-zinc-900 dark:text-white">
-                Как работает автоматизация Vanguard Realty
-              </h2>
-            </motion.div>
+              <div className="max-w-2xl space-y-3">
+                <span className="text-xs font-bold uppercase tracking-[0.25em] text-amber-500">
+                  ПЕРСОНАЛЬНЫЙ ПОКАЗ НЕДВИЖИМОСТИ
+                </span>
+                <h2 className="text-3xl sm:text-5xl font-extrabold leading-tight">
+                  Запись на просмотр выбранной квартиры
+                </h2>
+                <p className="text-base text-zinc-600 dark:text-zinc-400">
+                  Укажите ваши контактные данные, выберите интересующий объект
+                  недвижимости и удобный день для визита.
+                </p>
+              </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {[
-                {
-                  icon: Sparkles,
-                  title: "ИИ-Брокер Gemini 3.5 Flash Lite",
-                  desc: "Консультирует клиентов 24/7 по услугам, ипотеке и юридической чистоте, подбирает лоты по бюджету, комнатам и району и мягко переводит в заявку.",
-                },
-                {
-                  icon: Calendar,
-                  title: "Онлайн-запись на день просмотра",
-                  desc: "Клиент выбирает конкретную квартиру, указывает удобный день и время показа. Заявка мгновенно фиксируется в CRM/Админке сайта.",
-                },
-                {
-                  icon: Send,
-                  title: "Двусторонняя связка с Telegram",
-                  desc: "Все заявки с сайта дублируются в рабочую Telegram-группу агентства, а Telegram-бот принимает заявки клиентов и передает их на сайт.",
-                },
-              ].map((item, idx) => (
-                <motion.div
-                  key={item.title}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: idx * 0.12 }}
-                  className="p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-lg space-y-4"
-                >
-                  <div className="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-500 flex items-center justify-center">
-                    <item.icon className="w-6 h-6" />
+              <form onSubmit={handleSubmitMainBooking} className="space-y-6">
+                <div>
+                  <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                    Выберите объект недвижимости для просмотра *
+                  </label>
+                  <select
+                    value={mainPropertyId}
+                    onChange={(e) => setMainPropertyId(e.target.value)}
+                    className="w-full px-5 py-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-base font-medium focus:outline-none focus:border-amber-500"
+                  >
+                    {properties.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.title} ({p.district}, {p.rooms} комн. —{" "}
+                        {(p.price / 1e6).toFixed(1)} млн ₽)
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                      Ваше ФИО или Имя *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Например: Александр Романов"
+                      value={mainName}
+                      onChange={(e) => setMainName(e.target.value)}
+                      className="w-full px-5 py-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-base focus:outline-none focus:border-amber-500"
+                    />
                   </div>
-                  <h3 className="text-xl font-bold text-zinc-900 dark:text-white">
-                    {item.title}
-                  </h3>
-                  <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                    {item.desc}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
+                  <div>
+                    <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                      Контактный телефон *
+                    </label>
+                    <input
+                      type="tel"
+                      required
+                      placeholder="+7 (999) 000-00-00"
+                      value={mainPhone}
+                      onChange={(e) => setMainPhone(e.target.value)}
+                      className="w-full px-5 py-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-base focus:outline-none focus:border-amber-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div>
+                    <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                      В какой день удобно посмотреть *
+                    </label>
+                    <input
+                      type="date"
+                      required
+                      value={mainDate}
+                      onChange={(e) => setMainDate(e.target.value)}
+                      className="w-full px-5 py-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-base focus:outline-none focus:border-amber-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                      Удобное время показа
+                    </label>
+                    <select
+                      value={mainTime}
+                      onChange={(e) => setMainTime(e.target.value)}
+                      className="w-full px-5 py-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-base focus:outline-none focus:border-amber-500"
+                    >
+                      <option value="11:00">11:00 (Утренний показ)</option>
+                      <option value="14:00">14:00 (Дневной показ)</option>
+                      <option value="16:30">16:30 (Дневной показ)</option>
+                      <option value="19:00">19:00 (Вечерний показ)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                      Формат покупки / Семья
+                    </label>
+                    <select
+                      value={mainFormat}
+                      onChange={(e) => setMainFormat(e.target.value)}
+                      className="w-full px-5 py-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-base focus:outline-none focus:border-amber-500"
+                    >
+                      <option value="Для большой семьи с детьми">
+                        Для большой семьи с детьми
+                      </option>
+                      <option value="Для собственного проживания">
+                        Для собственного проживания
+                      </option>
+                      <option value="Семейная ипотека">
+                        Покупка по семейной ипотеке
+                      </option>
+                      <option value="Инвестиции">Инвестиции</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                    Дополнительные пожелания к просмотру (необязательно)
+                  </label>
+                  <textarea
+                    rows={3}
+                    placeholder="Укажите ваш @username в Telegram, желаемый бюджет или вопросы по квартире..."
+                    value={mainComment}
+                    onChange={(e) => setMainComment(e.target.value)}
+                    className="w-full px-5 py-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-base focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-center gap-4 pt-2">
+                  <button
+                    type="submit"
+                    className="w-full sm:w-auto flex-1 py-5 px-8 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-base shadow-xl shadow-amber-500/25 transition-all"
+                  >
+                    Оставить заявку на просмотр квартиры
+                  </button>
+                  <a
+                    href="https://t.me/esate_agent_bot?start=booking"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full sm:w-auto py-5 px-8 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-base text-center shadow-xl shadow-sky-500/20 transition-all"
+                  >
+                    Записаться через Telegram-бот
+                  </a>
+                </div>
+
+                {mainNotice && (
+                  <div className="p-5 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-500 text-sm font-bold flex items-center justify-center gap-2">
+                    <CheckCircle2 className="w-5 h-5" />
+                    {mainNotice}
+                  </div>
+                )}
+              </form>
+            </motion.div>
           </div>
         </section>
 
-        {/* Секция Telegram-бота и синхронизации с Админкой */}
-        <section id="telegram" className="py-20">
+        {/* СЕКЦИЯ TELEGRAM БОТА ДЛЯ КЛИЕНТОВ */}
+        <section id="telegram" className="pb-24">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, scale: 0.97 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              className="rounded-3xl bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-950 text-white p-8 sm:p-12 border border-zinc-800 shadow-2xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center"
+              className="rounded-3xl bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-950 text-white p-8 sm:p-14 border border-zinc-800 shadow-2xl flex flex-col lg:flex-row items-center justify-between gap-10"
             >
-              <div className="lg:col-span-7 space-y-5">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-500/20 text-sky-300 text-xs font-bold">
-                  <Send className="w-3.5 h-3.5" />
-                  TELEGRAM BOT + УВЕДОМЛЕНИЯ В ГРУППУ
-                </div>
+              <div className="space-y-4 max-w-2xl">
+                <span className="px-3.5 py-1.5 rounded-full bg-sky-500/20 text-sky-300 text-xs font-bold uppercase tracking-wider">
+                  TELEGRAM АВТОМАТИЗАЦИЯ VANGUARD REALTY
+                </span>
                 <h2 className="text-3xl sm:text-4xl font-extrabold">
-                  Запись клиентов через Telegram-бота с передачей в Админку
+                  Удобнее общаться в мессенджере? Запишитесь через наш Telegram-бот
                 </h2>
-                <p className="text-sm text-zinc-300 leading-relaxed">
-                  Клиенты могут записаться на просмотр как на сайте, так и в
-                  Telegram-боте. Бот проводит клиента по воронке (выбор квартиры
-                  → выбор дня просмотра → контакт), сохраняет заявку в единую
-                  Админ-панель сайта и отправляет уведомление в вашу рабочую
-                  Telegram-группу.
+                <p className="text-base text-zinc-300 leading-relaxed">
+                  Наш официальный Telegram-бот покажет актуальные квартиры,
+                  поможет выбрать день и время просмотра в 2 клика и сразу
+                  передаст вашу заявку персональному брокеру агентства.
                 </p>
-
-                <div className="flex flex-wrap gap-4 pt-2">
-                  <button
-                    onClick={handleSimulateTelegramBotBooking}
-                    disabled={simulatingBot}
-                    className="px-6 py-3.5 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-sm flex items-center gap-2 shadow-lg shadow-sky-500/25 transition-all"
-                  >
-                    <Send className="w-4 h-4" />
-                    {simulatingBot
-                      ? "Отправка из ТГ-бота..."
-                      : "Протестировать заявку из Telegram-бота"}
-                  </button>
-
-                  <Link
-                    href="/admin"
-                    className="px-6 py-3.5 rounded-2xl bg-white/10 hover:bg-white/15 text-white font-semibold text-sm flex items-center gap-2 border border-white/15 transition-all"
-                  >
-                    <ShieldCheck className="w-4 h-4 text-amber-400" />
-                    Открыть Админ-панель
-                    <ArrowUpRight className="w-4 h-4" />
-                  </Link>
-                </div>
-
-                {botSimSuccess && (
-                  <div className="p-3.5 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 shrink-0" />
-                    Тестовая заявка из Telegram-бота успешно записана в Админ-панель и отправлена в группу!
-                  </div>
-                )}
               </div>
-
-              <div className="lg:col-span-5 bg-zinc-950/90 border border-zinc-800 rounded-2xl p-5 space-y-3 text-xs font-mono text-zinc-300">
-                <div className="text-amber-400 font-bold">
-                  🏛 VANGUARD REALTY — TELEGRAM УВЕДОМЛЕНИЕ
-                </div>
-                <div>👤 Клиент: Артем Волков (@artem_volkov_estate)</div>
-                <div>📞 Телефон: +7 (925) 991-04-77</div>
-                <div>
-                  📍 Объект: Пентхаус в ЖК «Vanguard Knightsbridge»
-                </div>
-                <div>📅 День просмотра: 2026-11-19 в 16:00</div>
-                <div className="text-sky-400">
-                  📡 Источник: ✈️ Telegram-Бот → Синхронизировано с /admin
-                </div>
+              <div className="shrink-0">
+                <a
+                  href="https://t.me/esate_agent_bot?start=booking"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center px-9 py-5 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white font-extrabold text-base shadow-2xl shadow-sky-500/30 transition-all transform hover:-translate-y-0.5"
+                >
+                  Записаться через Telegram-бот →
+                </a>
               </div>
             </motion.div>
           </div>
         </section>
       </main>
 
-      {/* Подвал */}
       <footer className="py-10 border-t border-zinc-200 dark:border-zinc-800 text-center text-xs text-zinc-500">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2 font-bold text-zinc-800 dark:text-zinc-200">
             <Building2 className="w-4 h-4 text-amber-500" />
-            VANGUARD REALTY • AI REAL ESTATE AUTOMATION
+            VANGUARD REALTY • AI REAL ESTATE & TELEGRAM MINI APP
           </div>
           <div>
-            © 2026 Vanguard Realty. Умный подбор на базе Gemini 3.5 Flash Lite и Telegram Bot API.
+            © 2026 Vanguard Realty. Powered by Gemini 3.5 Flash Lite & Neon Postgres.
           </div>
         </div>
       </footer>

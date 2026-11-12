@@ -3,15 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import {
-  Building2,
-  Sun,
-  Moon,
-  Sparkles,
-  ShieldCheck,
-  Send,
-  CalendarCheck,
-} from "lucide-react";
+import { Building2 } from "lucide-react";
 
 export function Navbar({ onOpenBooking }: { onOpenBooking?: () => void }) {
   const { theme, setTheme } = useTheme();
@@ -48,7 +40,7 @@ export function Navbar({ onOpenBooking }: { onOpenBooking?: () => void }) {
           </div>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-7 text-sm font-medium text-zinc-700 dark:text-zinc-300">
+        <nav className="hidden lg:flex items-center gap-7 text-sm font-medium text-zinc-700 dark:text-zinc-300">
           <a
             href="#catalog"
             className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors"
@@ -57,59 +49,72 @@ export function Navbar({ onOpenBooking }: { onOpenBooking?: () => void }) {
           </a>
           <a
             href="#ai-advisor"
-            className="flex items-center gap-1.5 hover:text-amber-600 dark:hover:text-amber-400 transition-colors"
-          >
-            <Sparkles className="w-4 h-4 text-amber-500" />
-            ИИ-Подбор и Квиз
-          </a>
-          <a
-            href="#services"
             className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors"
           >
-            Услуги и Автоматизация
+            ИИ-Консультант
+          </a>
+          <a
+            href="#booking-section"
+            className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors"
+          >
+            Запись на просмотр
           </a>
           <a
             href="#telegram"
-            className="flex items-center gap-1.5 hover:text-amber-600 dark:hover:text-amber-400 transition-colors"
+            className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors"
           >
-            <Send className="w-3.5 h-3.5 text-sky-500" />
             Telegram-Бот
           </a>
           <Link
             href="/admin"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-amber-500/50 transition-colors text-xs font-semibold"
+            className="px-3.5 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-amber-500/50 transition-colors text-xs font-bold"
           >
-            <ShieldCheck className="w-3.5 h-3.5 text-amber-500" />
             Админ-панель
           </Link>
         </nav>
 
         <div className="flex items-center gap-3">
+          {/* Эстетичный минималистичный переключатель темы без символов и стикеров */}
           {mounted && (
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              aria-label="Переключить тему"
-              className="p-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:border-amber-500/60 transition-all"
-              title={
-                theme === "dark"
-                  ? "Включить светлую тему (Architectural Ivory)"
-                  : "Включить тёмную тему (Luxury Onyx)"
-              }
+              className="relative inline-flex items-center p-1 rounded-full bg-zinc-200/90 dark:bg-zinc-900 border border-zinc-300/80 dark:border-zinc-800 text-[11px] font-semibold tracking-wide transition-all duration-300"
             >
-              {theme === "dark" ? (
-                <Sun className="w-4 h-4 text-amber-400" />
-              ) : (
-                <Moon className="w-4 h-4 text-zinc-700" />
-              )}
+              <span
+                className={`px-3 py-1 rounded-full transition-all duration-300 ${
+                  theme !== "dark"
+                    ? "bg-zinc-900 text-white shadow-sm"
+                    : "text-zinc-500 dark:text-zinc-400"
+                }`}
+              >
+                Светлая
+              </span>
+              <span
+                className={`px-3 py-1 rounded-full transition-all duration-300 ${
+                  theme === "dark"
+                    ? "bg-amber-500 text-white shadow-sm"
+                    : "text-zinc-500"
+                }`}
+              >
+                Тёмная
+              </span>
             </button>
           )}
+
+          <a
+            href="https://t.me/esate_agent_bot?start=booking"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-sky-500/20 transition-all"
+          >
+            Записаться через Telegram-бот
+          </a>
 
           {onOpenBooking && (
             <button
               onClick={onOpenBooking}
-              className="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-sm font-semibold shadow-lg shadow-amber-500/25 transition-all"
+              className="hidden md:inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-amber-500/25 transition-all"
             >
-              <CalendarCheck className="w-4 h-4" />
               Записаться на показ
             </button>
           )}

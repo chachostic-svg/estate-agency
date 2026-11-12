@@ -12,7 +12,7 @@ interface AssistantResponse {
 export async function generateAssistantResponse(
   messages: { role: "user" | "assistant"; content: string }[]
 ): Promise<AssistantResponse> {
-  const properties = getProperties();
+  const properties = await getProperties();
   const apiKey = process.env.GEMINI_API_KEY;
   const preferredModel = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
 

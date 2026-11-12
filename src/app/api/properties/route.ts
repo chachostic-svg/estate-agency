@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { addProperty, deleteProperty, getProperties } from "@/lib/db";
 
 export async function GET() {
-  const properties = getProperties();
+  const properties = await getProperties();
   return NextResponse.json({ properties });
 }
 
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const created = addProperty({
+    const created = await addProperty({
       title,
       district: district || "Центральный",
       address,
@@ -93,7 +93,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Не указан ID" }, { status: 400 });
     }
 
-    const ok = deleteProperty(id);
+    const ok = await deleteProperty(id);
     return NextResponse.json({ deleted: ok });
   } catch (error) {
     return NextResponse.json(
