@@ -130,6 +130,17 @@ function Poll-TelegramBot {
             $Global:BotUsername = $me.result.username
             $Global:LastBotError = ""
             Write-Output "Connected to Telegram Bot: @$($Global:BotUsername)"
+            # Автоматически устанавливаем кнопку Telegram Mini App на https://estate-agency-sooty.vercel.app/
+            Invoke-TelegramApi "setChatMenuButton" @{
+                menu_button = @{
+                    type = "web_app"
+                    text = "🏛 Mini App"
+                    web_app = @{
+                        url = "https://estate-agency-sooty.vercel.app/"
+                    }
+                }
+            } | Out-Null
+            Write-Output "Configured Telegram Mini App Menu Button -> https://estate-agency-sooty.vercel.app/"
         }
     }
 
@@ -186,6 +197,7 @@ function Poll-TelegramBot {
         if ($text -match "^/start") {
             $Global:UserSessions[$chatId] = @{ step = "choose_property" }
             $kbRows = @()
+            $kbRows += ,@(@{ text = "📱 Открыть приложение Vanguard Realty (Mini App)"; web_app = @{ url = "https://estate-agency-sooty.vercel.app/" } })
             foreach ($p in ($props | Select-Object -First 5)) {
                 $priceM = [math]::Round($p.price / 1000000, 1)
                 $kbRows += ,@(@{ text = "🏛 $($p.title) ($priceM млн ₽)" })
@@ -196,8 +208,7 @@ function Poll-TelegramBot {
                 one_time_keyboard = $true
             }
             $welcome = "🏛 <b>Добро пожаловать в Vanguard Realty, $(Escape-Html $firstName)!</b>`n`n" +
-                       "Я автоматический помощник агентства недвижимости.`n" +
-                       "Выберите интересующую квартиру на кнопках ниже (или напишите свои пожелания), чтобы записаться на просмотр:"
+                       "Вы можете открыть наше <b>Mini App приложение</b> по кнопке ниже (или синей кнопке меню слева внизу), либо выбрать квартиру прямо в чате:"
             Send-TelegramMessage $chatId $welcome $markup | Out-Null
             continue
         }

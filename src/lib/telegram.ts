@@ -12,7 +12,7 @@ export async function sendLeadToTelegramGroup(lead: Lead): Promise<{
   reason?: string;
 }> {
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
-  const groupChatId = process.env.TELEGRAM_GROUP_CHAT_ID;
+  const groupChatId = process.env.TELEGRAM_GROUP_CHAT_ID || "-5387102105";
 
   const messageText = [
     `🏛 <b>VANGUARD REALTY — НОВАЯ ЗАЯВКА</b>`,

@@ -69,9 +69,7 @@ export async function POST(req: NextRequest) {
       if (botToken) {
         const appUrl =
           process.env.NEXT_PUBLIC_APP_URL ||
-          (process.env.VERCEL_PROJECT_PRODUCTION_URL
-            ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-            : undefined);
+          "https://estate-agency-sooty.vercel.app/";
 
         await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
           method: "POST",
