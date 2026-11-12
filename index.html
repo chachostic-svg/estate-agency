@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vanguard Realty — Автоматизированное агентство недвижимости с ИИ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            gold: { 500: '#f59e0b', 600: '#d97706' }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    .reveal-on-scroll {
+      opacity: 0;
+      transform: translateY(34px);
+      transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal-on-scroll.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body class="bg-stone-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 antialiased selection:bg-amber-500 selection:text-white transition-colors duration-300">
+
+  <!-- НАВИГАЦИЯ -->
+  <header id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white/85 dark:bg-zinc-950/85 backdrop-blur-xl border-b border-zinc-200/80 dark:border-zinc-800/80 py-3.5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+      <a href="#" onclick="switchView('landing')" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-white font-black shadow-md shadow-amber-500/20">
+          V
+        </div>
+        <div>
+          <span class="text-lg font-bold tracking-wider uppercase text-zinc-900 dark:text-white block leading-none">Vanguard</span>
+          <span class="text-[10px] tracking-[0.28em] uppercase text-amber-600 dark:text-amber-400 font-semibold">Realty & AI</span>
+        </div>
+      </a>
+
+      <nav class="hidden lg:flex items-center gap-7 text-sm font-medium text-zinc-700 dark:text-zinc-300">
+        <a href="#catalog" onclick="switchView('landing')" class="hover:text-amber-500 transition-colors">Каталог объектов</a>
+        <a href="#ai-advisor" onclick="switchView('landing')" class="hover:text-amber-500 transition-colors">ИИ-Консультант</a>
+        <a href="#booking-section" onclick="switchView('landing')" class="hover:text-amber-500 transition-colors">Запись на просмотр</a>
+        <a href="#telegram" onclick="switchView('landing')" class="hover:text-amber-500 transition-colors">Telegram-Бот</a>
+        <button onclick="switchView('admin')" class="px-3.5 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-amber-500 text-xs font-bold transition-all">
+          Админ-панель
+        </button>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <!-- Эстетичный минималистичный переключатель темы без символов и стикеров -->
+        <button
+          id="themeToggleBtn"
+          onclick="toggleTheme()"
+          class="relative inline-flex items-center p-1 rounded-full bg-zinc-200/90 dark:bg-zinc-900 border border-zinc-300/80 dark:border-zinc-800 text-[11px] font-semibold tracking-wide transition-all duration-300"
+        >
+          <span id="themeLightPill" class="px-3 py-1 rounded-full transition-all duration-300 text-zinc-500 dark:text-zinc-400">
+            Светлая
+          </span>
+          <span id="themeDarkPill" class="px-3 py-1 rounded-full transition-all duration-300 bg-zinc-900 text-white dark:bg-amber-500 dark:text-white shadow-sm">
+            Тёмная
+          </span>
+        </button>
+
+        <a
+          href="https://t.me/esate_agent_bot?start=booking"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-sky-500/20 transition-all"
+        >
+          Записаться через Telegram-бот
+        </a>
+
+        <a
+          href="#booking-section"
+          onclick="switchView('landing')"
+          class="hidden md:inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-amber-500/25 transition-all"
+        >
+          Записаться на показ
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ОСНОВНОЙ ЛЕНДИНГ -->
+  <div id="landingView">
+    <!-- HERO СЕКЦИЯ С ПАРАЛЛАКСОМ ПРИ СКРОЛЛЕ -->
+    <section class="relative min-h-[92vh] flex items-center overflow-hidden pt-28 pb-20">
+      <div id="parallaxBg" class="absolute inset-0 -z-10 pointer-events-none will-change-transform">
+        <div class="absolute inset-0 bg-cover bg-center opacity-20 dark:opacity-30 scale-110" style="background-image: url('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=2000&q=85');"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-stone-50/90 via-stone-50/75 to-stone-50 dark:from-zinc-950/90 dark:via-zinc-950/75 dark:to-zinc-950"></div>
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-amber-500/15 blur-3xl"></div>
+      </div>
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          <div id="parallaxHeroText" class="lg:col-span-7 space-y-6 reveal-on-scroll visible">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300 text-xs font-semibold tracking-wider uppercase">
+              ИИ-АВТОМАТИЗАЦИЯ НЕДВИЖИМОСТИ • GEMINI-3.5-FLASH-LITE
+            </div>
+            <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight leading-[1.08] text-zinc-900 dark:text-white">
+              Интеллектуальный подбор резиденций
+              <span class="bg-gradient-to-r from-amber-500 via-amber-600 to-yellow-500 bg-clip-text text-transparent"> Vanguard Realty</span>
+            </h1>
+            <p class="text-base sm:text-lg text-zinc-600 dark:text-zinc-300 max-w-2xl leading-relaxed">
+              Цифровая экосистема элитной и семейной недвижимости: умный ИИ-помощник подберет квартиру или семейную резиденцию по вашему бюджету, количеству комнат и району, а онлайн-запись и Telegram-бот забронируют удобный день просмотра.
+            </p>
+            <div class="flex flex-wrap items-center gap-4 pt-2">
+              <a href="#booking-section" class="px-7 py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold shadow-xl shadow-amber-500/25 transition-all">
+                Записаться на просмотр
+              </a>
+              <a href="https://t.me/esate_agent_bot?start=booking" target="_blank" rel="noopener noreferrer" class="px-7 py-4 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white font-semibold shadow-xl shadow-sky-500/25 transition-all">
+                Записаться через Telegram-бот
+              </a>
+              <a href="#ai-advisor" class="px-6 py-4 rounded-2xl bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-white border border-zinc-200 dark:border-zinc-800 font-semibold transition-all">
+                Консультация с ИИ
+              </a>
+            </div>
+            <div class="grid grid-cols-3 gap-4 pt-6 border-t border-zinc-200/80 dark:border-zinc-800/80">
+              <div>
+                <div class="text-2xl sm:text-3xl font-bold">12+</div>
+                <div class="text-xs text-zinc-500">Престижных районов города</div>
+              </div>
+              <div>
+                <div class="text-2xl sm:text-3xl font-bold text-amber-500">1–6 комн.</div>
+                <div class="text-xs text-zinc-500">От студий до резиденций для больших семей</div>
+              </div>
+              <div>
+                <div class="text-2xl sm:text-3xl font-bold">0%</div>
+                <div class="text-xs text-zinc-500">Комиссия для покупателя</div>
+              </div>
+            </div>
+          </div>
+
+          <div id="parallaxHeroCard" class="lg:col-span-5 relative will-change-transform reveal-on-scroll visible">
+            <div class="rounded-3xl overflow-hidden border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-2xl">
+              <img src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1000&q=85" alt="Vanguard Family Residence" class="w-full h-80 object-cover" />
+              <div class="p-6 space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-500">Выбор для большой семьи</span>
+                  <span class="text-lg font-bold">46.8 млн ₽</span>
+                </div>
+                <h3 class="text-xl font-bold">Семейная резиденция «Крылатские Холмы Парк»</h3>
+                <p class="text-xs text-zinc-500">Крылатское • ул. Крылатские Холмы, д. 33 • 5 комн. • 192 м²</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- КАТАЛОГ НЕДВИЖИМОСТИ (12 РАЙОНОВ + КВАРТИРЫ ДЛЯ БОЛЬШИХ СЕМЕЙ) -->
+    <section id="catalog" class="py-24">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+        <div class="reveal-on-scroll flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-[0.25em] text-amber-500">КАТАЛОГ РЕЗИДЕНЦИЙ VANGUARD</span>
+            <h2 class="text-3xl sm:text-4xl font-extrabold mt-2">Актуальные предложения недвижимости</h2>
+          </div>
+          <p class="text-sm text-zinc-500 max-w-md">В каталоге представлены как стильные городские апартаменты, так и просторные 4–6 комнатные резиденции и таунхаусы для больших семей.</p>
+        </div>
+
+        <!-- Фильтры -->
+        <div class="reveal-on-scroll p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xl grid grid-cols-1 sm:grid-cols-3 gap-5 items-end">
+          <div>
+            <label class="block text-xs font-semibold uppercase text-zinc-500 mb-2">Район города</label>
+            <select id="filterDistrict" onchange="renderCatalog()" class="w-full px-4 py-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-sm">
+              <option value="all">Все районы</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase text-zinc-500 mb-2">Количество комнат / Формат</label>
+            <select id="filterRooms" onchange="renderCatalog()" class="w-full px-4 py-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-sm">
+              <option value="all">Любое количество комнат</option>
+              <option value="1">1 комната / студия</option>
+              <option value="2">2 комнаты</option>
+              <option value="3">3 комнаты</option>
+              <option value="4">4 комнаты</option>
+              <option value="5+">5–6 комнат (Для большой семьи)</option>
+            </select>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs font-semibold uppercase text-zinc-500 mb-2">
+              <span>Бюджет до:</span>
+              <span id="budgetLabel" class="text-amber-500 font-bold">85 млн ₽</span>
+            </div>
+            <input id="filterBudget" type="range" min="15" max="85" value="85" oninput="document.getElementById('budgetLabel').innerText = this.value + ' млн ₽'; renderCatalog();" class="w-full accent-amber-500 cursor-pointer" />
+          </div>
+        </div>
+
+        <!-- Сетка квартир -->
+        <div id="catalogGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+      </div>
+    </section>
+
+    <!-- УМНЫЙ ИИ-ПОМОЩНИК (GEMINI-3.5-FLASH-LITE) -->
+    <section id="ai-advisor" class="py-24 bg-zinc-100/70 dark:bg-zinc-900/40 border-y border-zinc-200/70 dark:border-zinc-800/80">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        <div class="reveal-on-scroll text-center max-w-3xl mx-auto space-y-3">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/15 text-amber-500 text-xs font-bold uppercase tracking-wider">
+            GEMINI-3.5-FLASH-LITE • ПЕРСОНАЛЬНЫЙ ИИ-БРОКЕР
+          </div>
+          <h2 class="text-3xl sm:text-4xl font-extrabold">Умный ИИ-помощник Vanguard Realty</h2>
+          <p class="text-sm text-zinc-500">Задайте любой вопрос по услугам агентства, семейной ипотеке или попросите подобрать квартиру по бюджету, району и количеству комнат.</p>
+        </div>
+
+        <!-- Диалог с ИИ -->
+        <div id="aiChatContainer" class="reveal-on-scroll max-w-4xl mx-auto rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-2xl">
+          <div class="p-5 px-6 bg-zinc-900 text-white flex items-center justify-between">
+            <div class="text-sm font-bold flex items-center gap-2.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              Vanguard AI Консультант
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] bg-emerald-500/20 text-emerald-400">gemini-3.5-flash-lite</span>
+            </div>
+            <a href="#booking-section" class="text-xs text-amber-400 hover:underline font-semibold">Перейти к форме записи →</a>
+          </div>
+
+          <div id="chatMessagesBox" class="h-96 overflow-y-auto p-6 space-y-4 bg-zinc-50/50 dark:bg-zinc-950/50"></div>
+
+          <!-- Быстрые запросы к ИИ -->
+          <div class="px-6 py-3 bg-zinc-100 dark:bg-zinc-900/90 border-t border-zinc-200 dark:border-zinc-800 flex flex-wrap gap-2">
+            <button type="button" onclick="sendQuickPrompt('Подбери просторную квартиру для большой семьи от 5 комнат рядом с парком и школой')" class="text-xs px-3.5 py-1.5 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:border-amber-500 transition-colors">
+              Квартира для большой семьи (5–6 комнат)
+            </button>
+            <button type="button" onclick="sendQuickPrompt('Предложи 2–3 комнатную квартиру с бюджетом до 35 млн рублей')" class="text-xs px-3.5 py-1.5 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:border-amber-500 transition-colors">
+              2–3 комнатная до 35 млн ₽
+            </button>
+            <button type="button" onclick="sendQuickPrompt('Расскажи про услуги агентства, семейную ипотеку и запись на просмотр')" class="text-xs px-3.5 py-1.5 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:border-amber-500 transition-colors">
+              Услуги агентства и семейная ипотека
+            </button>
+          </div>
+
+          <form onsubmit="event.preventDefault(); sendChatMessage();" class="p-4 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 flex gap-3">
+            <input id="chatInput" type="text" placeholder="Напишите ваш бюджет, желаемый район, количество комнат или вопрос..." class="flex-1 px-4 py-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-sm focus:outline-none focus:border-amber-500" />
+            <button type="submit" class="px-7 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm transition-colors">Отправить</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- БОЛЬШАЯ СЕКЦИЯ ЗАПИСИ КЛИЕНТОВ НА ПРОСМОТР НЕДВИЖИМОСТИ -->
+    <section id="booking-section" class="py-28">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="reveal-on-scroll rounded-[2rem] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-8 sm:p-14 shadow-2xl space-y-8">
+          <div class="max-w-2xl space-y-3">
+            <span class="text-xs font-bold uppercase tracking-[0.25em] text-amber-500">ПЕРСОНАЛЬНЫЙ ПОКАЗ НЕДВИЖИМОСТИ</span>
+            <h2 class="text-3xl sm:text-5xl font-extrabold leading-tight">Запись на просмотр выбранной квартиры</h2>
+            <p class="text-base text-zinc-600 dark:text-zinc-400">
+              Укажите ваши контактные данные, выберите интересующий объект недвижимости и удобный день для визита. Заявка мгновенно поступает в систему и рабочую группу брокеров.
+            </p>
+          </div>
+
+          <form id="mainBookingForm" onsubmit="submitMainBookingForm(event)" class="space-y-6">
+            <div>
+              <label class="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                Выберите объект недвижимости для просмотра *
+              </label>
+              <select id="mainPropertySelect" class="w-full px-5 py-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-base font-medium focus:outline-none focus:border-amber-500"></select>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                  Ваше ФИО или Имя *
+                </label>
+                <input id="mainName" type="text" required placeholder="Например: Александр Романов" class="w-full px-5 py-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-base focus:outline-none focus:border-amber-500" />
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                  Контактный телефон *
+                </label>
+                <input id="mainPhone" type="tel" required placeholder="+7 (999) 000-00-00" class="w-full px-5 py-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-base focus:outline-none focus:border-amber-500" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label class="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                  В какой день удобно посмотреть *
+                </label>
+                <input id="mainDate" type="date" required value="2026-11-16" class="w-full px-5 py-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-base focus:outline-none focus:border-amber-500" />
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                  Удобное время показа
+                </label>
+                <select id="mainTime" class="w-full px-5 py-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-base focus:outline-none focus:border-amber-500">
+                  <option value="11:00">11:00 (Утренний показ)</option>
+                  <option value="14:00" selected>14:00 (Дневной показ)</option>
+                  <option value="16:30">16:30 (Дневной показ)</option>
+                  <option value="19:00">19:00 (Вечерний показ)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                  Формат покупки / Семья
+                </label>
+                <select id="mainNotesSelect" class="w-full px-5 py-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-base focus:outline-none focus:border-amber-500">
+                  <option value="Для собственного проживания">Для собственного проживания</option>
+                  <option value="Для большой семьи с детьми">Для большой семьи с детьми</option>
+                  <option value="Семейная ипотека">Покупка по семейной ипотеке</option>
+                  <option value="Инвестиции и сохранение капитала">Инвестиции</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                Дополнительные пожелания к просмотру (необязательно)
+              </label>
+              <textarea id="mainComment" rows="3" placeholder="Укажите ваш @username в Telegram, желаемый бюджет или вопросы по квартире..." class="w-full px-5 py-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-base focus:outline-none focus:border-amber-500"></textarea>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center gap-4 pt-2">
+              <button type="submit" class="w-full sm:w-auto flex-1 py-5 px-8 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-base shadow-xl shadow-amber-500/25 transition-all">
+                Оставить заявку на просмотр квартиры
+              </button>
+              <a href="https://t.me/esate_agent_bot?start=booking" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto py-5 px-8 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-base text-center shadow-xl shadow-sky-500/20 transition-all">
+                Записаться через Telegram-бот
+              </a>
+            </div>
+
+            <div id="mainBookingNotice" class="hidden p-5 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-500 text-sm font-bold text-center"></div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- СЕКЦИЯ TELEGRAM БОТА ДЛЯ КЛИЕНТОВ -->
+    <section id="telegram" class="pb-24">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="reveal-on-scroll rounded-3xl bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-950 text-white p-8 sm:p-14 border border-zinc-800 shadow-2xl flex flex-col lg:flex-row items-center justify-between gap-10">
+          <div class="space-y-4 max-w-2xl">
+            <span class="px-3.5 py-1.5 rounded-full bg-sky-500/20 text-sky-300 text-xs font-bold uppercase tracking-wider">
+              TELEGRAM АВТОМАТИЗАЦИЯ VANGUARD REALTY
+            </span>
+            <h2 class="text-3xl sm:text-4xl font-extrabold">
+              Удобнее общаться в мессенджере? Запишитесь через наш Telegram-бот
+            </h2>
+            <p class="text-base text-zinc-300 leading-relaxed">
+              Наш официальный Telegram-бот покажет актуальные квартиры, поможет выбрать день и время просмотра в 2 клика и сразу передаст вашу заявку персональному брокеру агентства.
+            </p>
+          </div>
+          <div class="shrink-0">
+            <a
+              href="https://t.me/esate_agent_bot?start=booking"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center justify-center px-9 py-5 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white font-extrabold text-base shadow-2xl shadow-sky-500/30 transition-all transform hover:-translate-y-0.5"
+            >
+              Записаться через Telegram-бот →
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- АДМИН-ПАНЕЛЬ -->
+  <div id="adminView" class="hidden pt-28 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+    <div class="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-200 dark:border-zinc-800 pb-6">
+      <div>
+        <span class="text-xs font-bold uppercase tracking-widest text-amber-500">VANGUARD REALTY CRM & ADMIN</span>
+        <h1 class="text-3xl font-extrabold">Панель управления недвижимостью и заявками</h1>
+      </div>
+      <button onclick="switchView('landing')" class="px-5 py-2.5 rounded-xl bg-zinc-200 dark:bg-zinc-800 text-xs font-bold">← Вернуться на сайт</button>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <!-- Добавление новой недвижимости с загрузкой ФОТО -->
+      <div class="lg:col-span-5">
+        <form id="adminAddPropertyForm" onsubmit="addPropertyFromAdmin(event)" class="p-7 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xl space-y-4">
+          <h2 class="text-xl font-bold">Добавить новую недвижимость</h2>
+
+          <div>
+            <label class="block text-xs font-bold text-zinc-500 mb-1">Название ЖК / Резиденции *</label>
+            <input id="admTitle" type="text" required placeholder="Например: Семейная резиденция «Парк Плаза»" class="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-sm" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-zinc-500 mb-1">Район *</label>
+              <input id="admDistrict" type="text" required placeholder="Крылатское / Хамовники" class="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-zinc-500 mb-1">Стоимость (₽) *</label>
+              <input id="admPrice" type="number" required placeholder="32500000" class="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-sm" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-zinc-500 mb-1">Точный адрес квартиры *</label>
+            <input id="admAddress" type="text" required placeholder="ул. Крылатские Холмы, д. 15" class="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-sm" />
+          </div>
+
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-zinc-500 mb-1">Комнат *</label>
+              <input id="admRooms" type="number" required placeholder="4" class="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-zinc-500 mb-1">Площадь (м²) *</label>
+              <input id="admArea" type="number" required placeholder="140" class="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-sm" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-zinc-500 mb-1">Этаж *</label>
+              <input id="admFloor" type="number" required placeholder="7" class="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-sm" />
+            </div>
+          </div>
+
+          <!-- БЛАНК ДЛЯ ЗАГРУЗКИ ФОТОГРАФИИ КВАРТИРЫ -->
+          <div class="space-y-2">
+            <label class="block text-xs font-bold text-zinc-500">Фотография квартиры (загрузите файл или вставьте ссылку)</label>
+            <label
+              for="admPhotoFile"
+              class="flex flex-col items-center justify-center w-full h-36 rounded-2xl border-2 border-dashed border-amber-500/50 hover:border-amber-500 bg-zinc-50 dark:bg-zinc-950 cursor-pointer transition-all overflow-hidden relative"
+            >
+              <div id="admPhotoPlaceholder" class="text-center p-4 space-y-1">
+                <div class="text-xs font-bold text-amber-500">Нажмите, чтобы выбрать фото квартиры с компьютера</div>
+                <div class="text-[11px] text-zinc-400">Поддерживаются форматы JPG, PNG, WEBP</div>
+              </div>
+              <img id="admPhotoPreview" src="" alt="Preview" class="hidden w-full h-full object-cover" />
+              <input id="admPhotoFile" type="file" accept="image/*" onchange="handleAdminPhotoUpload(event)" class="hidden" />
+            </label>
+            <input id="admImageUrl" type="url" placeholder="Или вставьте прямую ссылку на фото (необязательно)" class="w-full px-3.5 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-xs" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-zinc-500 mb-1">Описание квартиры</label>
+            <textarea id="admDesc" rows="3" placeholder="Опишите планировку, преимущества для семьи, вид из окон..." class="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-sm"></textarea>
+          </div>
+
+          <button type="submit" class="w-full py-4 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm shadow-lg shadow-amber-500/20 transition-all">
+            Опубликовать недвижимость на сайте
+          </button>
+
+          <div id="admSuccessMsg" class="hidden p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-xs text-emerald-500 font-bold text-center"></div>
+        </form>
+      </div>
+
+      <!-- Список заявок клиентов -->
+      <div class="lg:col-span-7 space-y-4">
+        <h2 class="text-xl font-bold">Заявки клиентов (Сайт и Telegram-Бот)</h2>
+        <div id="adminLeadsList" class="space-y-3"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- БОЛЬШОЕ МОДАЛЬНОЕ ОКНО ЗАПИСИ НА ПРОСМОТР КОНКРЕТНОЙ КВАРТИРЫ -->
+  <div id="bookingModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
+    <div class="relative w-full max-w-2xl rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-8 sm:p-10 shadow-2xl space-y-6">
+      <button onclick="closeBookingModal()" class="absolute top-6 right-6 text-zinc-400 hover:text-zinc-900 dark:hover:text-white text-xl font-bold">✕</button>
+      <div>
+        <span class="text-xs font-bold uppercase tracking-widest text-amber-500">ПРИВАТНЫЙ ПОКАЗ VANGUARD REALTY</span>
+        <h3 class="text-2xl sm:text-3xl font-extrabold mt-1">Запись на просмотр недвижимости</h3>
+      </div>
+
+      <form id="modalBookingForm" onsubmit="submitBookingModal(event)" class="space-y-5">
+        <div>
+          <label class="block text-sm font-bold text-zinc-600 dark:text-zinc-300 mb-1.5">Выбранная квартира</label>
+          <select id="modalPropertySelect" class="w-full px-4 py-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-base"></select>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-bold text-zinc-600 dark:text-zinc-300 mb-1.5">Ваше имя *</label>
+            <input id="modalName" type="text" required placeholder="Введите ваше имя" class="w-full px-4 py-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-base" />
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-zinc-600 dark:text-zinc-300 mb-1.5">Ваш телефон *</label>
+            <input id="modalPhone" type="tel" required placeholder="+7 (999) 000-00-00" class="w-full px-4 py-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-base" />
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-bold text-zinc-600 dark:text-zinc-300 mb-1.5">День просмотра *</label>
+            <input id="modalDate" type="date" required value="2026-11-16" class="w-full px-4 py-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-base" />
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-zinc-600 dark:text-zinc-300 mb-1.5">Время показа</label>
+            <select id="modalTime" class="w-full px-4 py-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-base">
+              <option value="11:00">11:00</option>
+              <option value="14:00" selected>14:00</option>
+              <option value="16:30">16:30</option>
+              <option value="19:00">19:00</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-base shadow-xl">
+          Подтвердить запись на просмотр
+        </button>
+        <div id="modalSuccessNotice" class="hidden p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-center text-sm font-bold text-emerald-500"></div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const FALLBACK_PROPERTIES = [
+      {
+        id: "prop-1",
+        title: "Пентхаус с террасой в ЖК «Vanguard Knightsbridge»",
+        district: "Хамовники",
+        address: "ул. Ефремова, д. 19, корп. 1",
+        price: 68500000,
+        rooms: 4,
+        area: 164,
+        floor: 14,
+        imageUrl: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=85",
+        description: "Видовой двухуровневый пентхаус с собственной озелененной террасой 45 м², панорамным остеклением в пол и камином.",
+        badge: "Эксклюзив"
+      },
+      {
+        id: "prop-2",
+        title: "Большая семейная резиденция «Крылатские Холмы Парк»",
+        district: "Крылатское",
+        address: "ул. Крылатские Холмы, д. 33, корп. 2",
+        price: 46800000,
+        rooms: 5,
+        area: 192,
+        floor: 6,
+        imageUrl: "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1200&q=85",
+        description: "Просторная 5-комнатная квартира специально для большой семьи: мастер-блок для родителей, 3 детские спальни, гостиная 52 м². Во дворе частный лицей и детсад.",
+        badge: "Для большой семьи"
+      },
+      {
+        id: "prop-3",
+        title: "Апартаменты Sky-класса в «Neva Towers»",
+        district: "Пресненский (Сити)",
+        address: "1-й Красногвардейский пр-д, д. 22, стр. 2",
+        price: 34900000,
+        rooms: 2,
+        area: 78,
+        floor: 52,
+        imageUrl: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=85",
+        description: "Дизайнерские апартаменты с панорамным видом с 52 этажа, мебелью Minotti и доступом в приватный SPA.",
+        badge: "Хит продаж"
+      },
+      {
+        id: "prop-4",
+        title: "Двухуровневый семейный особняк-таунхаус «Сколково Форест»",
+        district: "Сколково / Заречье",
+        address: "ул. Весенняя, д. 8, стр. 4",
+        price: 59000000,
+        rooms: 6,
+        area: 248,
+        floor: 1,
+        imageUrl: "https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=1200&q=85",
+        description: "Идеальный дом для большой семьи из 5–7 человек: 6 комнат, собственный дворик 4 сотки, 4 спальни, камин и гараж на 2 авто рядом с Мещерским парком.",
+        badge: "Для большой семьи"
+      },
+      {
+        id: "prop-5",
+        title: "Семейная резиденция у воды «Остров Премиум»",
+        district: "Хорошёво-Мнёвники",
+        address: "ул. Нижние Мнёвники, д. 14",
+        price: 26400000,
+        rooms: 3,
+        area: 96,
+        floor: 7,
+        imageUrl: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=85",
+        description: "Просторная трехкомнатная квартира в экологичном квартале в окружении реки и природного парка.",
+        badge: "Семейный выбор"
+      },
+      {
+        id: "prop-6",
+        title: "Клубный лофт «AURA Замоскворечье»",
+        district: "Замоскворечье",
+        address: "Садовническая наб., д. 69",
+        price: 41200000,
+        rooms: 3,
+        area: 112,
+        floor: 4,
+        imageUrl: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=85",
+        description: "Аутентичная резиденция в малоэтажном особняке на набережной с высотой потолков 3.8 м.",
+        badge: "Редкий лот"
+      },
+      {
+        id: "prop-7",
+        title: "Семейная усадьба в парке «Сокольники Гранд»",
+        district: "Сокольники",
+        address: "ул. Сокольнический Вал, д. 42",
+        price: 36500000,
+        rooms: 5,
+        area: 158,
+        floor: 9,
+        imageUrl: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1200&q=85",
+        description: "Пятикомнатная семейная квартира с видом на парк Сокольники: 4 изолированные спальни, большая гостиная, 3 санузла и безопасный двор без машин.",
+        badge: "Для большой семьи"
+      },
+      {
+        id: "prop-8",
+        title: "Смарт-студия бизнес-класса «Символ Прайм»",
+        district: "Даниловский",
+        address: "Автозаводская ул., д. 23, корп. 5",
+        price: 15800000,
+        rooms: 1,
+        area: 43,
+        floor: 11,
+        imageUrl: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1200&q=85",
+        description: "Идеальный лот с готовой дизайнерской отделкой и высокой доходностью аренды.",
+        badge: "Инвест-лот"
+      },
+      {
+        id: "prop-9",
+        title: "Видовая резиденция «Ботаника Парк»",
+        district: "Раменки",
+        address: "Мичуринский пр-т, д. 38",
+        price: 22500000,
+        rooms: 2,
+        area: 68,
+        floor: 16,
+        imageUrl: "https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1200&q=85",
+        description: "Квартира рядом с МГУ и Ботаническим садом с панорамными окнами в пол.",
+        badge: "Ипотека 5%"
+      },
+      {
+        id: "prop-10",
+        title: "Историческая резиденция «Патриаршие Делюкс»",
+        district: "Патриаршие пруды",
+        address: "Малый Козихинский пер., д. 11",
+        price: 74000000,
+        rooms: 4,
+        area: 146,
+        floor: 5,
+        imageUrl: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=85",
+        description: "Клубный дом на 18 квартир в тихом переулке Патриарших прудов с дровяным камином.",
+        badge: "Коллекционный лот"
+      },
+      {
+        id: "prop-11",
+        title: "Семейный квартал у залива «Покровский Берег»",
+        district: "Покровское-Стрешнево",
+        address: "Береговая ул., д. 6, корп. 3",
+        price: 31800000,
+        rooms: 4,
+        area: 134,
+        floor: 5,
+        imageUrl: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=1200&q=85",
+        description: "Просторный 4-комнатный лот для большой семьи на берегу водохранилища с собственным пляжем и английским детским садом.",
+        badge: "Для большой семьи"
+      },
+      {
+        id: "prop-12",
+        title: "Дизайнерская квартира «Арбатские Сезоны»",
+        district: "Арбат",
+        address: "ул. Новый Арбат, д. 29",
+        price: 29400000,
+        rooms: 2,
+        area: 64,
+        floor: 12,
+        imageUrl: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1200&q=85",
+        description: "Стильная резиденция в самом сердце исторического центра с панорамной лоджией.",
+        badge: "Премиум"
+      }
+    ];
+
+    let allProperties = [];
+    let allLeads = [];
+    let uploadedAdminPhotoBase64 = "";
+    let chatHistory = [
+      {
+        role: "assistant",
+        content: "Здравствуйте! Я умный ИИ-помощник Vanguard Realty (на базе gemini-3.5-flash-lite). В нашей базе 12 районов — от компактных студий до просторных 5–6 комнатных резиденций для больших семей. Напишите желаемый район, количество комнат или бюджет, и я подберу лучшие варианты!"
+      }
+    ];
+
+    // Плавный скролл Lenis и параллакс при скролле
+    const lenis = new Lenis({ duration: 1.15, smoothWheel: true });
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+
+    window.addEventListener("scroll", () => {
+      const y = window.scrollY;
+      const bg = document.getElementById("parallaxBg");
+      const card = document.getElementById("parallaxHeroCard");
+      if (bg) bg.style.transform = `translateY(${y * 0.25}px)`;
+      if (card && y < 700) card.style.transform = `translateY(${-y * 0.12}px)`;
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) e.target.classList.add("visible");
+      });
+    }, { threshold: 0.12 });
+
+    function observeElements() {
+      document.querySelectorAll(".reveal-on-scroll").forEach((el) => observer.observe(el));
+    }
+
+    // Эстетичное переключение темы без иконок/эмодзи
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.classList.toggle("dark");
+      const lightPill = document.getElementById("themeLightPill");
+      const darkPill = document.getElementById("themeDarkPill");
+      if (isDark) {
+        darkPill.className = "px-3 py-1 rounded-full transition-all duration-300 bg-amber-500 text-white shadow-sm";
+        lightPill.className = "px-3 py-1 rounded-full transition-all duration-300 text-zinc-400";
+      } else {
+        lightPill.className = "px-3 py-1 rounded-full transition-all duration-300 bg-zinc-900 text-white shadow-sm";
+        darkPill.className = "px-3 py-1 rounded-full transition-all duration-300 text-zinc-500";
+      }
+    }
+
+    // Показ уведомления об успешной отправке ровно на 15 секунд
+    function showTemporaryNotice(elementId, messageText, onExpireCallback) {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      el.innerText = messageText;
+      el.classList.remove("hidden");
+      if (el._hideTimer) clearTimeout(el._hideTimer);
+      el._hideTimer = setTimeout(() => {
+        el.classList.add("hidden");
+        el.innerText = "";
+        if (typeof onExpireCallback === "function") onExpireCallback();
+      }, 15000);
+    }
+
+    function switchView(view) {
+      document.getElementById("landingView").classList.toggle("hidden", view !== "landing");
+      document.getElementById("adminView").classList.toggle("hidden", view !== "admin");
+      if (view === "admin") loadData();
+    }
+
+    async function loadData() {
+      try {
+        const [pRes, lRes] = await Promise.all([fetch("/api/properties"), fetch("/api/leads")]);
+        const pData = await pRes.json();
+        const lData = await lRes.json();
+        allProperties = (pData.properties && pData.properties.length) ? pData.properties : FALLBACK_PROPERTIES;
+        allLeads = lData.leads || [];
+      } catch {
+        allProperties = FALLBACK_PROPERTIES;
+      }
+      populatePropertySelects();
+      renderCatalog();
+      renderAdminLeads();
+    }
+
+    function populatePropertySelects() {
+      const sel = document.getElementById("filterDistrict");
+      const current = sel.value;
+      const districts = [...new Set(allProperties.map((p) => p.district))];
+      sel.innerHTML = `<option value="all">Все районы (${districts.length})</option>` +
+        districts.map((d) => `<option value="${d}">${d}</option>`).join("");
+      sel.value = current || "all";
+
+      const optionsHtml = allProperties.map((p) =>
+        `<option value="${p.id}">${p.title} (${p.district}, ${p.rooms} комн. — ${(p.price / 1e6).toFixed(1)} млн ₽)</option>`
+      ).join("");
+
+      const modalSel = document.getElementById("modalPropertySelect");
+      if (modalSel) modalSel.innerHTML = optionsHtml;
+
+      const mainSel = document.getElementById("mainPropertySelect");
+      if (mainSel) mainSel.innerHTML = optionsHtml;
+    }
+
+    function renderCatalog() {
+      const dist = document.getElementById("filterDistrict").value;
+      const rooms = document.getElementById("filterRooms").value;
+      const maxBudget = Number(document.getElementById("filterBudget").value) * 1e6;
+
+      const filtered = allProperties.filter((p) => {
+        const mDist = dist === "all" || p.district === dist;
+        const mRoom =
+          rooms === "all" ||
+          (rooms === "5+" ? p.rooms >= 5 : p.rooms === Number(rooms));
+        const mPrice = p.price <= maxBudget;
+        return mDist && mRoom && mPrice;
+      });
+
+      const grid = document.getElementById("catalogGrid");
+      grid.innerHTML = filtered.map((p) => `
+        <article class="reveal-on-scroll visible rounded-3xl overflow-hidden bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-lg hover:shadow-2xl transition-all flex flex-col justify-between">
+          <div>
+            <div class="relative h-64 overflow-hidden">
+              <img src="${p.imageUrl}" alt="${p.title}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+              <span class="absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-bold ${p.rooms >= 4 ? 'bg-emerald-600' : 'bg-amber-500'} text-white shadow-md">${p.badge || 'В продаже'}</span>
+              <div class="absolute bottom-3 left-4 right-4 flex justify-between items-end text-white bg-black/50 backdrop-blur-sm p-3 rounded-xl">
+                <div>
+                  <div class="text-xs text-amber-300">${p.district}</div>
+                  <div class="text-xl font-extrabold">${(p.price / 1e6).toFixed(1)} млн ₽</div>
+                </div>
+                <span class="text-xs font-semibold">${p.rooms} комн. • ${p.area} м²</span>
+              </div>
+            </div>
+            <div class="p-6 space-y-2.5">
+              <h3 class="text-lg font-bold leading-snug">${p.title}</h3>
+              <p class="text-xs text-zinc-500">${p.address}</p>
+              <p class="text-xs text-zinc-600 dark:text-zinc-400 line-clamp-3 leading-relaxed">${p.description}</p>
+            </div>
+          </div>
+          <div class="p-6 pt-0">
+            <button onclick="openBookingModal('${p.id}')" class="w-full py-3.5 rounded-2xl bg-zinc-900 dark:bg-amber-500 hover:bg-amber-600 text-white font-semibold text-sm transition-colors">
+              Выбрать день просмотра
+            </button>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function openBookingModal(propId) {
+      if (propId) document.getElementById("modalPropertySelect").value = propId;
+      document.getElementById("bookingModal").classList.remove("hidden");
+    }
+
+    function closeBookingModal() {
+      document.getElementById("bookingModal").classList.add("hidden");
+    }
+
+    // Отправка основной большой формы на странице (очистка полей + уведомление на 15 сек)
+    async function submitMainBookingForm(e) {
+      e.preventDefault();
+      const form = document.getElementById("mainBookingForm");
+      const propId = document.getElementById("mainPropertySelect").value;
+      const prop = allProperties.find((p) => p.id === propId);
+      const clientName = document.getElementById("mainName").value;
+      const phone = document.getElementById("mainPhone").value;
+      const preferredDate = document.getElementById("mainDate").value;
+      const preferredTime = document.getElementById("mainTime").value;
+      const familyFormat = document.getElementById("mainNotesSelect").value;
+      const comment = document.getElementById("mainComment").value;
+
+      const payload = {
+        clientName,
+        phone,
+        propertyId: propId,
+        propertyTitle: prop ? prop.title : "Выбранная квартира",
+        preferredDate,
+        preferredTime,
+        source: "website_booking",
+        notes: `${familyFormat}${comment ? ' | ' + comment : ''}`
+      };
+
+      await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      // Сразу очищаем заполненные поля формы
+      form.reset();
+      populatePropertySelects();
+
+      // Показываем уведомление ровно на 15 секунд
+      showTemporaryNotice(
+        "mainBookingNotice",
+        "Заявка успешно отправлена! Брокер свяжется с вами для подтверждения показа (это уведомление скроется через 15 секунд)."
+      );
+      await loadData();
+    }
+
+    // Отправка модальной формы записи (очистка полей + уведомление на 15 сек)
+    async function submitBookingModal(e) {
+      e.preventDefault();
+      const form = document.getElementById("modalBookingForm");
+      const propId = document.getElementById("modalPropertySelect").value;
+      const prop = allProperties.find((p) => p.id === propId);
+      const payload = {
+        clientName: document.getElementById("modalName").value,
+        phone: document.getElementById("modalPhone").value,
+        propertyId: propId,
+        propertyTitle: prop ? prop.title : "Выбранная квартира",
+        preferredDate: document.getElementById("modalDate").value,
+        preferredTime: document.getElementById("modalTime").value,
+        source: "website_booking"
+      };
+
+      await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      // Сразу очищаем заполненные поля формы
+      form.reset();
+      populatePropertySelects();
+
+      // Показываем уведомление и скрываем через 15 секунд
+      showTemporaryNotice(
+        "modalSuccessNotice",
+        "Заявка успешно отправлена в Админ-панель и Telegram-группу!",
+        () => closeBookingModal()
+      );
+      await loadData();
+    }
+
+    function renderChatMessages() {
+      const box = document.getElementById("chatMessagesBox");
+      box.innerHTML = chatHistory.map((m) => `
+        <div class="flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}">
+          <div class="max-w-xl rounded-2xl px-4 py-3 text-sm whitespace-pre-line ${m.role === 'user' ? 'bg-amber-500 text-white' : 'bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800'}">${m.content}</div>
+        </div>
+      `).join("");
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function sendQuickPrompt(text) {
+      document.getElementById("chatInput").value = text;
+      sendChatMessage();
+    }
+
+    async function sendChatMessage() {
+      const input = document.getElementById("chatInput");
+      const text = input.value.trim();
+      if (!text) return;
+      chatHistory.push({ role: "user", content: text });
+      input.value = "";
+      renderChatMessages();
+
+      try {
+        const res = await fetch("/api/ai-chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages: chatHistory })
+        });
+        const data = await res.json();
+        chatHistory.push({ role: "assistant", content: data.reply });
+      } catch {
+        chatHistory.push({
+          role: "assistant",
+          content: "Для большой семьи рекомендую обратить внимание на 5-комнатную резиденцию «Крылатские Холмы Парк» (192 м², 46.8 млн ₽) и 6-комнатный таунхаус «Сколково Форест» (248 м², 59 млн ₽). Записаться на просмотр можно в форме ниже!"
+        });
+      }
+      renderChatMessages();
+    }
+
+    // Обработка загрузки фотографии квартиры в Админ-панели
+    function handleAdminPhotoUpload(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        uploadedAdminPhotoBase64 = e.target.result;
+        const preview = document.getElementById("admPhotoPreview");
+        const placeholder = document.getElementById("admPhotoPlaceholder");
+        preview.src = uploadedAdminPhotoBase64;
+        preview.classList.remove("hidden");
+        placeholder.classList.add("hidden");
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Добавление квартиры из Админки (с загруженным фото, автоочисткой формы и скрытием уведомления через 15 сек)
+    async function addPropertyFromAdmin(e) {
+      e.preventDefault();
+      const form = document.getElementById("adminAddPropertyForm");
+      const photoUrl = uploadedAdminPhotoBase64 || document.getElementById("admImageUrl").value.trim() || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=85";
+
+      await fetch("/api/properties", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          adminPassword: "vanguard2026",
+          title: document.getElementById("admTitle").value,
+          district: document.getElementById("admDistrict").value,
+          price: Number(document.getElementById("admPrice").value),
+          address: document.getElementById("admAddress").value,
+          rooms: Number(document.getElementById("admRooms").value),
+          area: Number(document.getElementById("admArea").value),
+          floor: Number(document.getElementById("admFloor").value),
+          imageUrl: photoUrl,
+          description: document.getElementById("admDesc").value
+        })
+      });
+
+      // Сбрасываем форму и превью загруженного фото
+      form.reset();
+      uploadedAdminPhotoBase64 = "";
+      document.getElementById("admPhotoPreview").src = "";
+      document.getElementById("admPhotoPreview").classList.add("hidden");
+      document.getElementById("admPhotoPlaceholder").classList.remove("hidden");
+
+      showTemporaryNotice(
+        "admSuccessMsg",
+        "Квартира с фотографией успешно опубликована в каталоге! (уведомление исчезнет через 15 секунд)"
+      );
+      await loadData();
+    }
+
+    function renderAdminLeads() {
+      const box = document.getElementById("adminLeadsList");
+      box.innerHTML = allLeads.map((l) => `
+        <div class="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/15 text-amber-500">${l.source}</span>
+            <div class="font-bold text-sm mt-1">${l.clientName} — <span class="text-amber-500">${l.phone}</span></div>
+            <div class="text-xs text-zinc-500">${l.propertyTitle} • День показа: <b>${l.preferredDate} ${l.preferredTime || ''}</b></div>
+            ${l.notes ? `<div class="text-xs text-zinc-400 mt-0.5">${l.notes}</div>` : ''}
+          </div>
+          <span class="text-xs font-bold px-3 py-1 rounded-xl bg-emerald-500/15 text-emerald-500">${l.status}</span>
+        </div>
+      `).join("");
+    }
+
+    observeElements();
+    renderChatMessages();
+    loadData();
+    setInterval(loadData, 6000);
+  </script>
+</body>
+</html>
